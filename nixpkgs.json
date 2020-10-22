@@ -1,0 +1,5 @@
+{
+  "url": "https://github.com/NixOS/nixpkgs.git",
+  "ref": "nixos-20.09",
+  "rev": "bc260badaebf67442befe20fb443034d3a91f2b3"
+}
