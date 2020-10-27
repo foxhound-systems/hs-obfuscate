@@ -1,26 +1,29 @@
+{-# LANGUAGE DerivingVia  #-}
 {-# LANGUAGE TypeFamilies #-}
 module Web.ObfuscateSpec
     where
 
-import           Data.Either          ( fromRight )
-import           Data.Int             ( Int64 )
-import           Database.Persist.Sql ( Key, toSqlKey )
 import           Hashids
 import           Test.Hspec
 import           Web.Obfuscate
 
+-- Simple custom data type with one obfuscatable field
 data TestFixture = TestFixture
     { _a :: ObIntegral Int
     , _b :: String
     }
     deriving (Show, Eq)
 
+
+-- Data type representing the obfuscated version of the above
 data ObfuscatedTestFixture = ObfuscatedTestFixture
     { ob_a :: Obfuscated (ObIntegral Int)
     , ob_b :: String
     }
     deriving (Show, Eq)
 
+
+-- CanObfuscate/CanDeobfuscate instances describe obfuscation behavior
 type instance Obfuscated TestFixture = ObfuscatedTestFixture
 instance CanObfuscate TestFixture where
     obfuscate ctx fixture =
@@ -36,6 +39,8 @@ instance CanDeobfuscate TestFixture where
             , _b = ob_b fixture
             }
 
+
+-- Data type that nests an obfuscatable custom data type within itself
 data NestedTestFixture = NestedTestFixture
     { _innerFixture :: TestFixture
     }
@@ -60,26 +65,38 @@ instance CanDeobfuscate NestedTestFixture where
 
 spec :: Spec
 spec = do
-    let (Right hashidsContext) = mkHashidsContext "mySaltGoesHere" 7 defaultAlphabet
-    describe "Defaults " $ do
+    let (Right ctx) = mkHashidsContext "test-salt-please-ignore" 7 defaultAlphabet
+    describe "Testing instances written by hand" $ do
         it "can obfuscate and deobfuscate integers" $ do
             let i = 12312 :: Int
-            deobfuscate hashidsContext (obfuscate hashidsContext (ObIntegral i)) `shouldBe` Just (ObIntegral i)
+
+            deobfuscate ctx (obfuscate ctx (ObIntegral i))
+              `shouldBe`
+                Just (ObIntegral i)
+
 
         it "can obfuscate and deobfuscate custom data types" $ do
             let testFixture = TestFixture
                                 { _a = 1
                                 , _b = "hello"
                                 }
-            deobfuscate hashidsContext (obfuscate hashidsContext testFixture) `shouldBe` Just testFixture
+
+            deobfuscate ctx (obfuscate ctx testFixture)
+              `shouldBe`
+                Just testFixture
+
 
         it "ignores non obfuscateable values" $ do
             let testFixture = TestFixture
                                 { _a = 1
                                 , _b = "hello"
                                 }
-            let obfuscatedTestFixture = obfuscate hashidsContext testFixture
-            ob_b obfuscatedTestFixture `shouldBe` _b testFixture
+            let obfuscatedTestFixture = obfuscate ctx testFixture
+
+            ob_b obfuscatedTestFixture
+              `shouldBe`
+                _b testFixture
+
 
         it "supports nested obfuscation" $ do
             let testFixture = TestFixture
@@ -87,7 +104,10 @@ spec = do
                                 , _b = "hello"
                                 }
             let nestedFixture = NestedTestFixture testFixture
-            let obfuscatedTestFixture = obfuscate hashidsContext testFixture
-            let obfuscatedNestedTestFixture = obfuscate hashidsContext nestedFixture
-            ob_innerFixture obfuscatedNestedTestFixture `shouldBe` obfuscatedTestFixture
+            let obfuscatedTestFixture = obfuscate ctx testFixture
+            let obfuscatedNestedTestFixture = obfuscate ctx nestedFixture
+
+            ob_innerFixture obfuscatedNestedTestFixture
+              `shouldBe`
+                obfuscatedTestFixture
 

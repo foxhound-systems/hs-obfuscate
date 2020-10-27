@@ -19,7 +19,9 @@ import Hashids
 ...
 
 hashidsContext :: HashidsContext
-hashidsContext = fromRight $ mkHashidsContext "mySaltGoesHere" 6 defaultAlphabet
+hashidsContext = ctx
+    where
+      (Right ctx) = mkHashidsContext "test-salt-please-ignore" 7 defaultAlphabet
 
 getUser :: Obfuscated UserId -> IO (User)
 getUser obfuscatedUserId =
@@ -27,7 +29,7 @@ getUser obfuscatedUserId =
     case maybeUserId of
         Just userId ->
           fetchUserById userId
-          
+
         Nothing ->
           throwIO err400
 
@@ -41,7 +43,7 @@ getUser obfuscatedUserId =
 module ForumResponse
   where
 
-import Web.Obfuscate 
+import Web.Obfuscate
 import Web.Obfuscate.TH
 import qualified Data.Text as T
 
@@ -63,37 +65,37 @@ The above Template Haskell code will generate something like the following:
 
 ```haskell
 data ObfuscatedForumResponse = ObfuscatedForumResponse
-   { obfrForumId :: Obfuscated ForumId
-   , obfrName :: Text
-   , obfrDescription :: Text
-   , obfrCreator :: Obfuscated ForumAdministrator
-   , obfrAdministrators :: Obfuscated [ForumAdministrator]
-   }
+    { obfrForumId :: Obfuscated ForumId
+    , obfrName :: Text
+    , obfrDescription :: Text
+    , obfrCreator :: Obfuscated ForumAdministrator
+    , obfrAdministrators :: Obfuscated [ForumAdministrator]
+    }
 
 type instance Obfuscated ForumResponse = ObfuscatedForumResponse
 
 instance CanObfuscate ForumResponse where
-  obfuscate ctx forumResponse =
-    ObfuscatedForumResponse
-     { obfrForumId = obfuscate ctx $ frForumId forumResponse
-     , obfrName = frName forumResponse
-     , obfrDescription = frDescription forumResponse
-     , obfrCreator = obfuscate ctx $ frCreator forumResponse
-     , obfrAdministrators = obfuscate ctx $ frAdministrators forumResponse
-     }
+    obfuscate ctx forumResponse =
+        ObfuscatedForumResponse
+            { obfrForumId = obfuscate ctx $ frForumId forumResponse
+            , obfrName = frName forumResponse
+            , obfrDescription = frDescription forumResponse
+            , obfrCreator = obfuscate ctx $ frCreator forumResponse
+            , obfrAdministrators = obfuscate ctx $ frAdministrators forumResponse
+            }
 
 instance CanDeobfuscateForumResponse where
-  deobfuscate ctx obfuscatedForumResponse = do
-    forumId <- deobfuscate ctx $ obfrForumId obfuscatedForumResponse
-    creator <- deobfuscate ctx $ obfrCreator obfuscatedForumResponse
-    administrators <- deobfuscate ctx $ obfrAdministrators obfuscatedForumResponse
-    pure $ ForumResponse
-     { frForumId = forumId
-     , frName = obfrName obfuscatedForumResponse
-     , frDescription = obfrDescription obfuscatedForumResponse
-     , frCreator = creator
-     , frAdministrators = administrators
-     }
+    deobfuscate ctx obfuscatedForumResponse = do
+        forumId <- deobfuscate ctx $ obfrForumId obfuscatedForumResponse
+        creator <- deobfuscate ctx $ obfrCreator obfuscatedForumResponse
+        administrators <- deobfuscate ctx $ obfrAdministrators obfuscatedForumResponse
+        pure $ ForumResponse
+            { frForumId = forumId
+            , frName = obfrName obfuscatedForumResponse
+            , frDescription = obfrDescription obfuscatedForumResponse
+            , frCreator = creator
+            , frAdministrators = administrators
+            }
 ```
 
 ## Development
