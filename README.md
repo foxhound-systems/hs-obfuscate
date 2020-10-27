@@ -100,7 +100,13 @@ instance CanDeobfuscateForumResponse where
 
 ## Development
 
-Development of this library is done using Nix. With `nix` installed, you can run the `nix-shell --command ghcid` command to start a ghcid session in an isolated environment. Run `nix-build` to perform a full build of the library.
+Development of this library is done using Nix. With `nix` installed, following command to start a ghcid session in an isolated environment and run the reloading tests:
+
+```
+nix-shell --run "make tests-watch"
+```
+
+Run `nix-build` to perform a full build of the library.
 
 ## License
 
