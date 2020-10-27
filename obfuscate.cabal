@@ -33,5 +33,14 @@ test-suite obfuscate-hs-test
   default-language:    Haskell2010
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             MyLibTest.hs
+  main-is:             Spec.hs
+  other-modules:       Web.ObfuscateSpec
   build-depends:       base ^>=4.13.0.0
+                     , obfuscate
+                     , hspec
+                     , aeson
+                     , hashids-st
+                     , persistent
+                     , scientific
+                     , text
+                     , template-haskell
