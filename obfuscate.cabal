@@ -19,7 +19,7 @@ library
                      , Web.Obfuscate.TH
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>=4.13.0.0
+  build-depends:       base >=4.13.0.0
                      , aeson
                      , hashids-st
                      , persistent
@@ -35,7 +35,7 @@ test-suite obfuscate-hs-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Web.ObfuscateSpec
-  build-depends:       base ^>=4.13.0.0
+  build-depends:       base >=4.13.0.0
                      , obfuscate
                      , hspec
                      , aeson
