@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                obfuscate
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            A small library for obfuscating numeric IDs
 -- description:
 homepage:            https://github.com/foxhound-systems/hs-obfuscate
@@ -25,7 +25,7 @@ library
                      , persistent
                      , scientific
                      , text
-                     , template-haskell
+                     , template-haskell >= 4.18.0.0
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -43,4 +43,4 @@ test-suite obfuscate-hs-test
                      , persistent
                      , scientific
                      , text
-                     , template-haskell
+                     , template-haskell >= 4.18.0.0

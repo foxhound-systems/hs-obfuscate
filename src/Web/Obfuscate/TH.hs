@@ -64,7 +64,7 @@ deriveObfuscate options tyName = do
             pureFn = VarE $ mkName "pure"
         (deobfuscatedBinds, deobfuscatedFields) <- fmap mconcat $ traverse assignDeobfuscatedField tys
 
-        let body = DoE $ join
+        let body = DoE Nothing $ join
                     [ fmap (\(p, e) -> BindS p e) deobfuscatedBinds
                     , [NoBindS (pureFn `AppE` (RecConE n deobfuscatedFields))]
                     ]
@@ -93,7 +93,7 @@ deriveObfuscate options tyName = do
         let ps = fmap VarP xs
         fields <- traverse obfuscateNormalField (zip xs tys)
         let body = foldl AppE (ConE (obfuscatedConstructorName n)) fields
-        pure $ Clause [VarP ctx, ConP n ps] (NormalB body) []
+        pure $ Clause [VarP ctx, ConP n mempty ps] (NormalB body) []
 
       obfuscateClause (RecC n tys) = do
         let ctx = mkName "ctx"
